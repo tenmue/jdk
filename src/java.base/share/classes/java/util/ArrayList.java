@@ -96,6 +96,11 @@ import jdk.internal.util.ArraysSupport;
  * <a href="{@docRoot}/java.base/java/util/package-summary.html#CollectionsFramework">
  * Java Collections Framework</a>.
  *
+ * 参考
+ * https://blog.csdn.net/kiround/article/details/124766009
+ * https://blog.csdn.net/qq_56717234/article/details/129387182
+ * https://javaguide.cn/java/collection/arraylist-source-code.html#_2-arraylist-%E6%A0%B8%E5%BF%83%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB
+ *
  * @param <E> the type of elements in this list
  *
  * @author  Josh Bloch
@@ -114,11 +119,13 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * Default initial capacity.
+     * 默认初始容量大小
      */
     private static final int DEFAULT_CAPACITY = 10;
 
     /**
      * Shared empty array instance used for empty instances.
+     * 空数组（用于空实例）
      */
     private static final Object[] EMPTY_ELEMENTDATA = {};
 
@@ -126,6 +133,8 @@ public class ArrayList<E> extends AbstractList<E>
      * Shared empty array instance used for default sized empty instances. We
      * distinguish this from EMPTY_ELEMENTDATA to know how much to inflate when
      * first element is added.
+     * 用于默认大小空实例的共享空数组实例
+     * 我们把它从EMPTY_ELEMENTDATA数组中区分出来，以知道在添加第一个元素时容量需要增加多少
      */
     private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
 
@@ -134,11 +143,13 @@ public class ArrayList<E> extends AbstractList<E>
      * The capacity of the ArrayList is the length of this array buffer. Any
      * empty ArrayList with elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA
      * will be expanded to DEFAULT_CAPACITY when the first element is added.
+     * 保存ArrayList数据的数组
      */
     transient Object[] elementData; // non-private to simplify nested class access
 
     /**
      * The size of the ArrayList (the number of elements it contains).
+     * ArrayList 所包含的元素个数
      *
      * @serial
      */
@@ -150,11 +161,14 @@ public class ArrayList<E> extends AbstractList<E>
      * @param  initialCapacity  the initial capacity of the list
      * @throws IllegalArgumentException if the specified initial capacity
      *         is negative
+     * 带初始容量参数的构造函数（用户可以在创建ArrayList对象时自己指定集合的初始大小）
      */
     public ArrayList(int initialCapacity) {
+        //如果传入的参数大于0，则创建initialCapacity大小的数组
         if (initialCapacity > 0) {
             this.elementData = new Object[initialCapacity];
         } else if (initialCapacity == 0) {
+            //如果传入的参数等于0，则创建空数组
             this.elementData = EMPTY_ELEMENTDATA;
         } else {
             throw new IllegalArgumentException("Illegal Capacity: "+
@@ -229,19 +243,23 @@ public class ArrayList<E> extends AbstractList<E>
      * @throws OutOfMemoryError if minCapacity is less than zero
      */
     private Object[] grow(int minCapacity) {
-        int oldCapacity = elementData.length;
+        int oldCapacity = elementData.length; //当前长度设置为当前元素数量
+        //当前长度大于0  或  数组缓冲区不等于默认共享空数组实例（设置的长度）
+        //不是第一次调用add方法
         if (oldCapacity > 0 || elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
             int newCapacity = ArraysSupport.newLength(oldCapacity,
                     minCapacity - oldCapacity, /* minimum growth */
                     oldCapacity >> 1           /* preferred growth */);
-            return elementData = Arrays.copyOf(elementData, newCapacity);
+            return elementData = Arrays.copyOf(elementData, newCapacity); //将数据复制到新数组中
         } else {
+            //返回DEFAULT_CAPACITY和minCapacity二者中的最大值
+            //第一次调用的时候会执行此逻辑
             return elementData = new Object[Math.max(DEFAULT_CAPACITY, minCapacity)];
         }
     }
 
     private Object[] grow() {
-        return grow(size + 1);
+        return grow(size + 1); //调用重载的grow方法，参数为当前数组大小加1
     }
 
     /**
@@ -450,10 +468,10 @@ public class ArrayList<E> extends AbstractList<E>
      * which helps when add(E) is called in a C1-compiled loop.
      */
     private void add(E e, Object[] elementData, int s) {
-        if (s == elementData.length)
-            elementData = grow();
-        elementData[s] = e;
-        size = s + 1;
+        if (s == elementData.length) //判断当前大小是否等于元素长度
+            elementData = grow(); //扩容
+        elementData[s] = e; //将数据填入
+        size = s + 1; //数组大小加1
     }
 
     /**
@@ -463,7 +481,7 @@ public class ArrayList<E> extends AbstractList<E>
      * @return {@code true} (as specified by {@link Collection#add})
      */
     public boolean add(E e) {
-        modCount++;
+        modCount++; //记录更改次数
         add(e, elementData, size);
         return true;
     }
